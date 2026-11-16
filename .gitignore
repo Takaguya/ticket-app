@@ -1,0 +1,59 @@
+# One repository for the whole project: backend/, merchant-app/, user-app/, admin-panal/.
+# Each folder also has its own .gitignore; this one covers what is common and the leftovers.
+
+# --- Editors, tools and the operating system ---------------------------------
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.claude/
+.DS_Store
+Thumbs.db
+*.swp
+
+# --- Secrets and local configuration: never in git -----------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.jks
+*.keystore
+key.properties
+local.properties
+application-local.yml
+
+# --- Logs and scratch ----------------------------------------------------------
+*.log
+*.pyc
+*.class
+
+# --- Build output and downloaded dependencies (rebuilt by the tools) -------------
+# backend (Maven)
+target/
+# Flutter apps
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+coverage/
+# admin panel (npm, Vite)
+node_modules/
+dist/
+*.local
+
+# --- Not part of the repository ---------------------------------------------------
+# Saved web pages (design exports) and the developer handoff PDF: reference copies kept on disk only.
+/Pin User & Merchant Apps Developer Handoff.pdf
+/admin-panal/Pin admin *.html
+/admin-panal/Pin admin *_files/
+/merchant-app/*.html
+/user-app/*.html
+
+# The README of the repository is written by hand; the old per-project ones stay on disk only.
+/backend/README.md
+/merchant-app/README.md
+/user-app/README.md
+/admin-panal/README.md

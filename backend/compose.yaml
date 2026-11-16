@@ -1,0 +1,21 @@
+# Development database. `mvnw spring-boot:run` starts it automatically
+# (spring-boot-docker-compose); `docker compose up -d` also works.
+# Port 5434 on the host: 5432 is the local PostgreSQL service and 5433 another
+# project's container on this machine.
+# The password is for this local container only; production reads PIN_DB_* variables.
+services:
+  postgres:
+    image: postgres:18
+    # Started again by Docker if it crashes. It recovers from its write-ahead log on start.
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pin
+      POSTGRES_USER: pin
+      POSTGRES_PASSWORD: pin_dev_only
+    ports:
+      - "5434:5432"
+    volumes:
+      - pin-postgres:/var/lib/postgresql
+
+volumes:
+  pin-postgres:

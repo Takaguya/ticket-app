@@ -1,0 +1,25 @@
+# Only what the image build needs goes into the build: pom.xml, mvnw, .mvn and src/main.
+target/
+.git/
+.gitignore
+.gitattributes
+
+# Tests are not compiled in the image, and the demo data (src/dev) is compiled out of it.
+src/test/
+src/dev/
+
+# Local files, and anything that may hold secrets
+.env
+.env.*
+*.log
+.idea/
+.vscode/
+*.iml
+application-local.yml
+
+# Not part of the image (nginx has its own container; its certificate must never be in one)
+nginx/
+compose*.yaml
+Dockerfile
+.dockerignore
+README.md

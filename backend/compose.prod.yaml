@@ -1,0 +1,77 @@
+# The backend, its database and nginx, for a server. Not the development setup: that is
+# compose.yaml, which `mvnw spring-boot:run` starts for you.
+#
+#   cp .env.example .env                              # then fill it in
+#   put fullchain.pem and privkey.pem in nginx/certs/ # see nginx/certs/README.md
+#   docker compose -f compose.prod.yaml up -d --build
+#
+# Only nginx is open to the internet (ports 80 and 443). The database and the backend have no
+# port on the host at all: nginx reaches the backend over Docker's private network, and the apps
+# use https://<PIN_DOMAIN>.
+# Its own project name, so its database volume is never the development one's (compose.yaml).
+name: pin
+
+services:
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pin
+      POSTGRES_USER: pin
+      POSTGRES_PASSWORD: ${PIN_DB_PASSWORD:?Set PIN_DB_PASSWORD in .env}
+    volumes:
+      # Where PostgreSQL 18 keeps its data. This volume is the data: back it up.
+      - pin-postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pin -d pin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    image: pin-backend:latest
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # "prod" is also set in the image: a development setting left on then stops the server
+      # from starting (DevSwitchesGuard).
+      SPRING_PROFILES_ACTIVE: prod
+      PIN_DB_URL: jdbc:postgresql://postgres:5432/pin
+      PIN_DB_USER: pin
+      PIN_DB_PASSWORD: ${PIN_DB_PASSWORD:?Set PIN_DB_PASSWORD in .env}
+      # The first admin: created on start, or given this password if it is not theirs yet.
+      PIN_ADMINACCOUNT_EMAIL: ${PIN_ADMINACCOUNT_EMAIL:-}
+      PIN_ADMINACCOUNT_PASSWORD: ${PIN_ADMINACCOUNT_PASSWORD:-}
+      PIN_ADMINACCOUNT_NAME: ${PIN_ADMINACCOUNT_NAME:-Pin admin}
+      # Behind nginx, rate-limit sign-in by the client's address (X-Forwarded-For), not nginx's.
+      # Only safe because nginx is the only way in, and it sets that header itself.
+      SERVER_FORWARD_HEADERS_STRATEGY: native
+
+  nginx:
+    image: nginx:1.28-alpine
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      # The template is filled in with this when nginx starts.
+      PIN_DOMAIN: ${PIN_DOMAIN:?Set PIN_DOMAIN in .env, the name the apps use, for example api.example.com}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+      # fullchain.pem and privkey.pem. Read-only, and never part of an image.
+      - ./nginx/certs:/etc/nginx/certs:ro
+    healthcheck:
+      # Answers when nginx is up and accepted its configuration (and so found its certificate).
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/nginx-health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  pin-postgres:

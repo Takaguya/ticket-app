@@ -1,0 +1,330 @@
+/* Pin Admin. Colours, sizes and classes from the admin panel design. */
+
+:root {
+  --blue: #0151a6;
+  --blue-dark: #013f82;
+  --blue-soft: #e8f1fb;
+  --yellow: #ffd400;
+  --ink: #111;
+  --ink-2: #333;
+  --muted: #5c5c5c;
+  --line: #e6e6e6;
+  --line-soft: #efefef;
+  --page: #f4f4f4;
+  --red: #b02a2e;
+  --red-soft: #fdeaea;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+  color: var(--ink);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+input {
+  font-family: inherit;
+}
+
+input::placeholder {
+  color: #767676;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 14.5px;
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.nav:hover {
+  background: var(--blue-soft);
+}
+
+.nav[aria-current='page'] {
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-weight: 800;
+}
+
+.btn {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--blue);
+  background: var(--blue);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--blue-dark);
+}
+
+.btn.ghost {
+  background: #fff;
+  color: var(--blue);
+}
+
+.btn.ghost:hover:not(:disabled) {
+  background: var(--blue-soft);
+}
+
+.btn.danger {
+  background: #fff;
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.btn.danger:hover:not(:disabled) {
+  background: var(--red-soft);
+}
+
+.btn.solid-danger {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+
+.btn.solid-danger:hover:not(:disabled) {
+  background: #8f2226;
+}
+
+.btn.big {
+  min-height: 48px;
+  font-size: 15px;
+  width: 100%;
+}
+
+.chip {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 0;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--line);
+  color: var(--ink-2);
+}
+
+.chip[aria-pressed='true'] {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.th {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.row {
+  display: grid;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 14px;
+}
+
+.row.th {
+  border-top: 0;
+}
+
+.sub {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.strong {
+  font-weight: 700;
+}
+
+.table {
+  overflow-x: auto;
+}
+
+.empty {
+  padding: 28px 20px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--line);
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.bar > div {
+  height: 100%;
+  background: var(--blue);
+}
+
+.notice {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  background: var(--red-soft);
+  color: var(--red);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.field input {
+  min-height: 48px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 0 14px;
+  font-size: 16px;
+  color: var(--ink);
+  background: #fff;
+}
+
+.field input:focus {
+  border-color: var(--blue);
+  outline: none;
+}
+
+.error-text {
+  color: var(--red);
+  font-size: 13.5px;
+  margin: 0;
+}
+
+.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+.link:disabled {
+  color: var(--muted);
+}
+
+/* The forms of the signed-out pages, inside AuthCard. */
+.auth-form {
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-form h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.auth-form .hint {
+  margin: -6px 0 4px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.auth-form .footnote {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* A password input with a Show / Hide button inside it, on the right. */
+.password-input {
+  position: relative;
+  display: flex;
+}
+
+.password-input input {
+  flex: 1;
+  min-width: 0;
+  padding-right: 64px;
+}
+
+.password-input .reveal {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+}

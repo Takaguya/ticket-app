@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: pin-backend
+  datasource:
+    # In development the database from compose.yaml is used instead (spring-boot-docker-compose).
+    url: ${PIN_DB_URL:jdbc:postgresql://localhost:5434/pin}
+    username: ${PIN_DB_USER:pin}
+    password: ${PIN_DB_PASSWORD:}
+    # If the database goes down, answer 503 within seconds instead of making scanners wait:
+    # the app shows a message and retries the same scan when it is back.
+    hikari:
+      connection-timeout: 5000      # ms to wait for a connection
+      validation-timeout: 2000      # ms to check a pooled connection still works
+      data-source-properties:
+        connectTimeout: 5           # s to open a new connection
+        # s without a reply from the database before giving up. Pin's queries take
+        # milliseconds; this keeps the answer well inside the app's 15 s wait.
+        socketTimeout: 8
+  docker:
+    compose:
+      # Leave the database running when the app stops, so restarts are quick.
+      lifecycle-management: start-only
+
+server:
+  port: 8080
+
+pin:
+  # Decides what "today" is (check-in opens on the event day) and how times are shown.
+  time-zone: Asia/Phnom_Penh
+  # Percent Pin keeps of online sales, for newly published events.
+  commission-rate: 5
+  otp:
+    ttl: 5m
+    resend-after: 30s
+    max-attempts: 5
+    # Development only: when set, this is the code for every phone and no SMS is sent.
+    # The server refuses to start with this (or the two other development switches) outside
+    # the dev/test profile or away from a local database: see DevSwitchesGuard.
+    dev-code:
+  registration-ttl: 30m
+  session-ttl: 30d
+  admin-sign-in:
+    # Wrong passwords in a row before an admin's sign-in is locked, and for how long.
+    max-wrong-passwords: 5
+    lock-for: 15m
+    # Development only: "forgot password" in the admin panel sets a new password straight
+    # away, with no proof the person is that admin. Never turn on in production.
+    dev-password-reset: false
+  # On startup, creates this admin if there is none, and gives them this password if it
+  # is not theirs yet: how the first admin is added and a forgotten password replaced.
+  # Set them as environment variables, never here: PIN_ADMINACCOUNT_EMAIL,
+  # PIN_ADMINACCOUNT_PASSWORD (at least 12 characters), PIN_ADMINACCOUNT_NAME.
+  admin-account:
+    email:
+    password:
+    name: Pin admin
+  # Creates the demo business (Khmer Runners Club), its staff, events and bookings on startup.
+  demo-data: false
+
+---
+# `mvnw spring-boot:run -Dspring-boot.run.profiles=dev`
+spring:
+  config:
+    activate:
+      on-profile: dev
+pin:
+  otp:
+    dev-code: "123456"
+  admin-sign-in:
+    dev-password-reset: true
+  demo-data: true

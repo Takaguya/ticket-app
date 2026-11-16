@@ -1,0 +1,81 @@
+# The public entrance to Pin: HTTPS in, plain HTTP to the backend on Docker's private network.
+# The nginx image fills in ${PIN_DOMAIN} from the environment when it starts (compose.prod.yaml).
+
+server_tokens off;
+
+# Port 80 only sends people to HTTPS. Nothing is served here, except the answer Docker's health
+# check asks for (it never leaves the container's own address).
+server {
+    listen 80 default_server;
+    server_name _;
+
+    location = /nginx-health {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    location / {
+        return 301 https://${PIN_DOMAIN}$request_uri;
+    }
+}
+
+# A request for any other name (or for the bare address) is dropped, so the server answers only
+# for its own domain.
+server {
+    listen 443 ssl default_server;
+    server_name _;
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    return 444;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${PIN_DOMAIN};
+
+    ssl_certificate     /etc/nginx/certs/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    # No security headers are added here: the backend sends its own (Strict-Transport-Security,
+    # X-Content-Type-Options, ...) once it knows the request came in over HTTPS, which it learns from
+    # X-Forwarded-Proto below. Adding them here too would send each one twice.
+
+    # The API takes small JSON bodies. A large one is not a client of ours.
+    client_max_body_size 1m;
+
+    # What every location sends on to the backend (a location with no proxy_set_header of its own
+    # inherits these).
+    proxy_http_version 1.1;
+    proxy_set_header Host              $host;
+    # Set, never appended to: whatever a client sends as X-Forwarded-For is thrown away, so
+    # nobody can pose as another address to get around the sign-in rate limit. The backend
+    # trusts this header (server.forward-headers-strategy=native) only because nginx is its
+    # only way in.
+    proxy_set_header X-Forwarded-For   $remote_addr;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host  $host;
+    proxy_set_header Connection        "";
+
+    # A scan or a sale is answered in milliseconds. Do not leave a person waiting on a hung one.
+    proxy_connect_timeout 5s;
+    proxy_read_timeout    30s;
+    proxy_send_timeout    30s;
+
+    # An event's cover image is a photo sent as the request body: up to 5 MB (the backend refuses a
+    # bigger one with a message the app shows), so 6m here lets that message get through instead of
+    # nginx's own 413. Only these two paths take a body this big.
+    location ~ ^/(merchant|admin)/events/[^/]+/image$ {
+        client_max_body_size 6m;
+        proxy_pass http://backend:8080;
+    }
+
+    location / {
+        proxy_pass http://backend:8080;
+    }
+}
