@@ -11,8 +11,8 @@ import java.util.UUID;
 
 import com.jayway.jsonpath.JsonPath;
 import com.ticket.app.backend.ApiTest;
-import com.ticket.app.backend.shared.domain.Ids;
-import com.ticket.app.backend.shared.domain.Money;
+import com.ticket.app.backend.shared.model.Ids;
+import com.ticket.app.backend.shared.model.Money;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;

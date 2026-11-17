@@ -11,23 +11,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.ticket.app.backend.booking.domain.Booking;
-import com.ticket.app.backend.booking.domain.BookingId;
-import com.ticket.app.backend.booking.domain.BookingLine;
-import com.ticket.app.backend.booking.domain.BookingStatus;
-import com.ticket.app.backend.booking.domain.PaymentMethod;
-import com.ticket.app.backend.booking.domain.SalesChannel;
-import com.ticket.app.backend.booking.domain.SeatBooking;
-import com.ticket.app.backend.business.domain.BusinessId;
-import com.ticket.app.backend.buyer.domain.Gender;
-import com.ticket.app.backend.event.domain.BusTrip;
-import com.ticket.app.backend.event.domain.Event;
-import com.ticket.app.backend.event.domain.EventId;
-import com.ticket.app.backend.event.domain.EventKind;
-import com.ticket.app.backend.event.domain.EventPage;
-import com.ticket.app.backend.event.domain.SeatLayout;
-import com.ticket.app.backend.shared.domain.Money;
-import com.ticket.app.backend.shared.domain.PhoneNumber;
+import com.ticket.app.backend.booking.model.Booking;
+import com.ticket.app.backend.booking.model.BookingId;
+import com.ticket.app.backend.booking.model.BookingLine;
+import com.ticket.app.backend.booking.model.BookingStatus;
+import com.ticket.app.backend.booking.model.PaymentMethod;
+import com.ticket.app.backend.booking.model.SalesChannel;
+import com.ticket.app.backend.booking.model.SeatBooking;
+import com.ticket.app.backend.business.model.BusinessId;
+import com.ticket.app.backend.buyer.model.Gender;
+import com.ticket.app.backend.event.model.BusTrip;
+import com.ticket.app.backend.event.model.Event;
+import com.ticket.app.backend.event.model.EventId;
+import com.ticket.app.backend.event.model.EventKind;
+import com.ticket.app.backend.event.model.EventPage;
+import com.ticket.app.backend.event.model.SeatLayout;
+import com.ticket.app.backend.shared.model.Money;
+import com.ticket.app.backend.shared.model.PhoneNumber;
 
 /**
  * The demo's bus trips: tours from Phnom Penh to the provinces, run by Giant Ibis, the demo's

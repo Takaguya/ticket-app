@@ -6,8 +6,8 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import com.ticket.app.backend.ApiTest;
-import com.ticket.app.backend.identity.application.SignInHousekeeping;
-import com.ticket.app.backend.shared.domain.Secrets;
+import com.ticket.app.backend.identity.service.SignInHousekeeping;
+import com.ticket.app.backend.shared.model.Secrets;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;

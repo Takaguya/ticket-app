@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-import com.ticket.app.backend.booking.domain.Booking;
-import com.ticket.app.backend.booking.domain.BookingId;
-import com.ticket.app.backend.booking.domain.SalesSummary;
-import com.ticket.app.backend.event.domain.Event;
-import com.ticket.app.backend.shared.domain.Money;
+import com.ticket.app.backend.booking.model.Booking;
+import com.ticket.app.backend.booking.model.BookingId;
+import com.ticket.app.backend.booking.model.SalesSummary;
+import com.ticket.app.backend.event.model.Event;
+import com.ticket.app.backend.shared.model.Money;
 import org.junit.jupiter.api.Test;
 
 /**

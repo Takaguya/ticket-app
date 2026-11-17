@@ -11,19 +11,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.ticket.app.backend.booking.domain.Booking;
-import com.ticket.app.backend.booking.domain.BookingId;
-import com.ticket.app.backend.booking.domain.BookingLine;
-import com.ticket.app.backend.booking.domain.BookingStatus;
-import com.ticket.app.backend.booking.domain.PaymentMethod;
-import com.ticket.app.backend.booking.domain.SalesChannel;
-import com.ticket.app.backend.business.domain.BusinessId;
-import com.ticket.app.backend.event.domain.Event;
-import com.ticket.app.backend.event.domain.EventId;
-import com.ticket.app.backend.event.domain.EventKind;
-import com.ticket.app.backend.event.domain.EventPage;
-import com.ticket.app.backend.event.domain.TicketType;
-import com.ticket.app.backend.shared.domain.Money;
+import com.ticket.app.backend.booking.model.Booking;
+import com.ticket.app.backend.booking.model.BookingId;
+import com.ticket.app.backend.booking.model.BookingLine;
+import com.ticket.app.backend.booking.model.BookingStatus;
+import com.ticket.app.backend.booking.model.PaymentMethod;
+import com.ticket.app.backend.booking.model.SalesChannel;
+import com.ticket.app.backend.business.model.BusinessId;
+import com.ticket.app.backend.event.model.Event;
+import com.ticket.app.backend.event.model.EventId;
+import com.ticket.app.backend.event.model.EventKind;
+import com.ticket.app.backend.event.model.EventPage;
+import com.ticket.app.backend.event.model.TicketType;
+import com.ticket.app.backend.shared.model.Money;
 
 /**
  * The demo's places, open every day: the user app mock's Angkor pass and wildlife centre, run by

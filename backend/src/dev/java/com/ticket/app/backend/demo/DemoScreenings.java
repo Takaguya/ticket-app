@@ -10,15 +10,15 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
-import com.ticket.app.backend.booking.domain.Booking;
-import com.ticket.app.backend.business.domain.BusinessId;
-import com.ticket.app.backend.event.domain.BusTrip;
-import com.ticket.app.backend.event.domain.Event;
-import com.ticket.app.backend.event.domain.EventId;
-import com.ticket.app.backend.event.domain.EventKind;
-import com.ticket.app.backend.event.domain.EventPage;
-import com.ticket.app.backend.event.domain.Screening;
-import com.ticket.app.backend.event.domain.SeatLayout;
+import com.ticket.app.backend.booking.model.Booking;
+import com.ticket.app.backend.business.model.BusinessId;
+import com.ticket.app.backend.event.model.BusTrip;
+import com.ticket.app.backend.event.model.Event;
+import com.ticket.app.backend.event.model.EventId;
+import com.ticket.app.backend.event.model.EventKind;
+import com.ticket.app.backend.event.model.EventPage;
+import com.ticket.app.backend.event.model.Screening;
+import com.ticket.app.backend.event.model.SeatLayout;
 
 /**
  * The demo's cinema screenings: four films, the same as the user app's mock, shown at two

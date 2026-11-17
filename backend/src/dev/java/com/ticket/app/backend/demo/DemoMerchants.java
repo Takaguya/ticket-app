@@ -11,15 +11,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.ticket.app.backend.business.domain.BusinessId;
-import com.ticket.app.backend.business.domain.BusinessStatus;
-import com.ticket.app.backend.business.domain.BusinessType;
-import com.ticket.app.backend.business.domain.StaffId;
-import com.ticket.app.backend.event.domain.Event;
-import com.ticket.app.backend.event.domain.EventId;
-import com.ticket.app.backend.event.domain.EventKind;
-import com.ticket.app.backend.event.domain.EventPage;
-import com.ticket.app.backend.event.domain.TicketType;
+import com.ticket.app.backend.business.model.BusinessId;
+import com.ticket.app.backend.business.model.BusinessStatus;
+import com.ticket.app.backend.business.model.BusinessType;
+import com.ticket.app.backend.business.model.StaffId;
+import com.ticket.app.backend.event.model.Event;
+import com.ticket.app.backend.event.model.EventId;
+import com.ticket.app.backend.event.model.EventKind;
+import com.ticket.app.backend.event.model.EventPage;
+import com.ticket.app.backend.event.model.TicketType;
 
 /**
  * The demo's other businesses, as in the admin panel's design: three more active

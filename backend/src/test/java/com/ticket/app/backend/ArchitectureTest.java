@@ -4,6 +4,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
+import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.Dependency;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -18,51 +19,66 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * The structure rules. Modules: shared, identity, business, buyer, event, booking, admin,
- * demo. Each feature module has the layers domain, application, infrastructure and web.
- * Dependencies run {@code identity -> buyer} and {@code booking -> buyer}; buyer uses only shared.
+ * demo. Each feature module has the folders controller, dto, service, model and repository
+ * (identity and shared also config). Dependencies run {@code identity -> buyer} and
+ * {@code booking -> buyer}; buyer uses only shared.
  *
  * <pre>
- *   web ──────────► application ──► domain ◄── infrastructure
- *   (controllers,    (use cases,     (entities,     (SQL, SMS)
- *    JSON)            transactions)   rules, ports)
+ *   controller ──► service ──► model ◄── repository
+ *   (HTTP)         (use cases,   (entities,  (interfaces,
+ *   dto            transactions)  rules)      SQL)
+ *   (JSON shapes)
  * </pre>
+ *
+ * The {@code repository} folder holds the interfaces the services use and, beside them, the SQL
+ * classes that implement them: only the interfaces may be used from other layers.
  */
 @AnalyzeClasses(packages = "com.ticket.app.backend", importOptions = ImportOption.DoNotIncludeTests.class)
 class ArchitectureTest {
 
     private static final String ROOT = "com.ticket.app.backend";
 
+    /**
+     * The SQL classes: what sits in a repository folder besides the interfaces (and the types nested
+     * in those, such as an enum an interface declares).
+     */
+    private static final DescribedPredicate<JavaClass> SQL_CLASSES =
+            DescribedPredicate.describe("SQL classes in a repository folder", ArchitectureTest::isSqlClass);
+
     @ArchTest
-    static final ArchRule theDomainIsPlainJava = classes()
-            .that().resideInAPackage("..domain..")
-            .should().onlyDependOnClassesThat().resideInAnyPackage("java..", "..domain..")
+    static final ArchRule theModelIsPlainJava = classes()
+            .that().resideInAPackage("..model..")
+            .should().onlyDependOnClassesThat().resideInAnyPackage("java..", "..model..")
             .because("business rules must not depend on Spring, SQL or HTTP");
 
     @ArchTest
-    static final ArchRule useCasesDoNotKnowAdapters = noClasses()
-            .that().resideInAPackage("..application..")
-            .should().dependOnClassesThat().resideInAnyPackage("..infrastructure..", "..web..")
-            .because("use cases talk to storage only through the domain's repository interfaces");
+    static final ArchRule servicesDoNotKnowAdaptersOrJson = noClasses()
+            .that().resideInAPackage("..service..")
+            .should().dependOnClassesThat(SQL_CLASSES)
+            .orShould().dependOnClassesThat().resideInAnyPackage("..controller..", "..dto..", ROOT + ".identity.config..")
+            .because("services talk to storage only through the repository interfaces, and know nothing of HTTP "
+                    + "(the settings in shared.config are fine to read)");
 
     @ArchTest
     static final ArchRule controllersDoNotTouchTheDatabase = noClasses()
-            .that().resideInAPackage("..web..")
-            .should().dependOnClassesThat().resideInAnyPackage("..infrastructure..", "org.springframework.jdbc..");
+            .that().resideInAnyPackage("..controller..", "..dto..", "..config..")
+            .should().dependOnClassesThat(SQL_CLASSES)
+            .orShould().dependOnClassesThat().resideInAPackage("org.springframework.jdbc..");
 
     @ArchTest
-    static final ArchRule adaptersDoNotCallUseCasesOrControllers = noClasses()
-            .that().resideInAPackage("..infrastructure..")
-            .should().dependOnClassesThat().resideInAnyPackage("..application..", "..web..");
+    static final ArchRule sqlClassesDoNotCallServicesOrControllers = noClasses()
+            .that(SQL_CLASSES)
+            .should().dependOnClassesThat().resideInAnyPackage("..service..", "..controller..", "..dto..", "..config..");
 
     @ArchTest
-    static final ArchRule controllersLiveInWeb = classes()
+    static final ArchRule controllersLiveInTheControllerFolder = classes()
             .that().areAnnotatedWith(RestController.class)
-            .should().resideInAPackage("..web..");
+            .should().resideInAPackage("..controller..");
 
     @ArchTest
-    static final ArchRule repositoriesLiveInInfrastructure = classes()
+    static final ArchRule repositoriesLiveInTheRepositoryFolder = classes()
             .that().areAnnotatedWith(Repository.class)
-            .should().resideInAPackage("..infrastructure..");
+            .should().resideInAPackage("..repository..");
 
     @ArchTest
     static final ArchRule modulesHaveNoCycles = slices()
@@ -85,22 +101,22 @@ class ArchitectureTest {
             .because("a buyer's account is used by identity (sign-in) and booking (bookings by a buyer), not the reverse");
 
     @ArchTest
-    static final ArchRule otherModulesAreUsedThroughTheirDomainOrApplication = classes()
-            .should(new ArchCondition<>("use other modules only through their domain or application layer") {
+    static final ArchRule otherModulesAreUsedThroughTheirModelOrService = classes()
+            .should(new ArchCondition<>("use other modules only through their model, service or repository interfaces") {
                 @Override
                 public void check(JavaClass item, ConditionEvents events) {
                     String own = moduleOf(item);
                     for (Dependency dependency : item.getDirectDependenciesFromSelf()) {
                         JavaClass target = dependency.getTargetClass();
                         String other = moduleOf(target);
-                        if (other != null && !other.equals(own) && !other.equals("shared") && isAdapter(target)) {
+                        if (other != null && !other.equals(own) && !other.equals("shared") && isInternal(target)) {
                             events.add(SimpleConditionEvent.violated(dependency, dependency.getDescription()));
                         }
                     }
                 }
             });
 
-    /** {@code booking} for {@code com.ticket.app.backend.booking.web}; null outside the modules. */
+    /** {@code booking} for {@code com.ticket.app.backend.booking.controller}; null outside the modules. */
     private static String moduleOf(JavaClass javaClass) {
         String packageName = javaClass.getPackageName();
         if (!packageName.startsWith(ROOT + ".")) {
@@ -111,8 +127,16 @@ class ArchitectureTest {
         return dot < 0 ? rest : rest.substring(0, dot);
     }
 
-    private static boolean isAdapter(JavaClass javaClass) {
+    /** A top-level class that is not an interface, in a repository folder. */
+    private static boolean isSqlClass(JavaClass javaClass) {
+        return javaClass.getPackageName().contains(".repository") && !javaClass.isInterface()
+                && !javaClass.isNestedClass();
+    }
+
+    /** What a module keeps to itself: its controllers, JSON shapes, configuration and SQL classes. */
+    private static boolean isInternal(JavaClass javaClass) {
         String packageName = javaClass.getPackageName();
-        return packageName.contains(".infrastructure") || packageName.contains(".web");
+        return packageName.contains(".controller") || packageName.contains(".dto") || packageName.contains(".config")
+                || isSqlClass(javaClass);
     }
 }
